@@ -1,0 +1,66 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.8.RELEASE'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'jacoco'
+
+group = 'sprada.bluemedia'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+
+    compile group: 'commons-io', name:'commons-io', version: '2.5'
+
+
+    compileOnly 'org.projectlombok:lombok:1.18.2'
+
+    //TEST
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
+
+
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    '**/*Application*',
+                    '**/*dto**',
+                    '**/*config**',
+                    '**/*enums**'
+            ])
+        })
+    }
+}
+
+test.finalizedBy('jacocoTestReport')
+
